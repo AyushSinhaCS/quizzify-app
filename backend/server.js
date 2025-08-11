@@ -19,21 +19,9 @@ connectDB();
 
 const app = express();
 
-// --- NEW, MORE ROBUST CORS CONFIGURATION ---
-const whitelist = ['https://quizzifyt.netlify.app'];
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (whitelist.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  }
-};
-
-app.use(cors(corsOptions));
+// --- NEW, SIMPLIFIED CORS CONFIGURATION FOR DEBUGGING ---
+// This will temporarily allow requests from any origin.
+app.use(cors());
 // --- END OF NEW CONFIGURATION ---
 
 
