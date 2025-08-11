@@ -19,8 +19,9 @@ connectDB();
 
 const app = express();
 
-// --- NEW, SIMPLIFIED CORS CONFIGURATION FOR DEBUGGING ---
-// This will temporarily allow requests from any origin.
+// --- FINAL, MOST ROBUST CORS CONFIGURATION ---
+// This handles the preflight request that browsers send first.
+app.options('*', cors()); // include before other routes
 app.use(cors());
 // --- END OF NEW CONFIGURATION ---
 
