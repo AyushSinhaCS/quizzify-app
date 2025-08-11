@@ -2,13 +2,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
-// --- This part remains the same ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 import express from 'express';
-import cors from 'cors'; // We will configure this
+import cors from 'cors';
 import connectDB from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
@@ -20,14 +19,21 @@ connectDB();
 
 const app = express();
 
-// --- NEW CORS CONFIGURATION ---
-// We explicitly tell the server to allow requests from your live frontend URL
+// --- NEW, MORE ROBUST CORS CONFIGURATION ---
+const whitelist = ['https://quizzifyt.netlify.app'];
 const corsOptions = {
-  origin: 'https://quizzifyt.netlify.app',
-  optionsSuccessStatus: 200 // For legacy browser support
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (whitelist.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
 };
 
-app.use(cors(corsOptions)); // Use the new options
+app.use(cors(corsOptions));
 // --- END OF NEW CONFIGURATION ---
 
 
