@@ -20,9 +20,9 @@ connectDB();
 const app = express();
 
 // --- FINAL, MOST ROBUST CORS CONFIGURATION ---
-// This handles the preflight request that browsers send first.
-app.options('*', cors()); // include before other routes
-app.use(cors());
+app.use(cors({
+  origin: 'https://quizzifyt.netlify.app'
+}));
 // --- END OF NEW CONFIGURATION ---
 
 
@@ -45,3 +45,6 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, console.log(`Server running on port ${PORT}`));
+
+// Export the app for Vercel
+export default app;
