@@ -19,17 +19,23 @@ connectDB();
 
 const app = express();
 
-// --- FINAL, MOST ROBUST CORS CONFIGURATION ---
-app.use(cors({
-  origin: 'https://quizzifyt.netlify.app'
-}));
+// --- DEFINITIVE CORS CONFIGURATION ---
+const corsOptions = {
+  origin: 'https://quizzifyt.netlify.app',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 // --- END OF NEW CONFIGURATION ---
 
 
 app.use(express.json());
 
+// This is a simple check to make sure the server is reachable
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.send('API is running and CORS is configured!');
 });
 
 // API Routes
