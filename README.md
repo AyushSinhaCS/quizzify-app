@@ -9,13 +9,13 @@ quizzifyt.netlify.app
 
 Homepage
 
-Dashboard
-
-Quiz Page
-
 <img src="https://github.com/user-attachments/assets/f26f6da0-7bb5-4453-ae42-15d903074cc2" width="100%" />
 
+Dashboard
+
 <img src="https://github.com/user-attachments/assets/3d68f595-ab69-49f5-8376-eed39312fbc2" width="100%" />
+
+Quiz Page
 
 <img src="https://github.com/user-attachments/assets/a9a55eae-b7d8-44e2-83ee-886798c62a6f" width="100%" />
 
