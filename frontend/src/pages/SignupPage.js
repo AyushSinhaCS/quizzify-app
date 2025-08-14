@@ -15,7 +15,8 @@ const SignupPage = () => {
     e.preventDefault();
     setError('');
     try {
-      const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/register`, {
+      // CORRECTED API PATH
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
         name,
         email,
         password,

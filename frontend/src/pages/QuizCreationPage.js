@@ -6,6 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 const QuizCreationPage = () => {
     const [topic, setTopic] = useState('');
     const [numQuestions, setNumQuestions] = useState(5);
+    const [difficulty, setDifficulty] = useState('medium');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { user } = useContext(AuthContext);
@@ -24,9 +25,10 @@ const QuizCreationPage = () => {
                 },
             };
 
+            // CORRECTED API PATH
             const { data } = await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/quizzes/generate`,
-                { topic, numQuestions },
+                `${process.env.REACT_APP_API_URL}/quizzes/generate`,
+                { topic, numQuestions, difficulty },
                 config
             );
             
@@ -58,7 +60,7 @@ const QuizCreationPage = () => {
                         required
                     />
                 </div>
-                <div className="mb-6">
+                <div className="mb-4">
                     <label htmlFor="numQuestions" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Number of Questions
                     </label>
@@ -71,6 +73,21 @@ const QuizCreationPage = () => {
                         <option value={5}>5</option>
                         <option value={10}>10</option>
                         <option value={15}>15</option>
+                    </select>
+                </div>
+                <div className="mb-6">
+                    <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Difficulty
+                    </label>
+                    <select
+                        id="difficulty"
+                        value={difficulty}
+                        onChange={(e) => setDifficulty(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600"
+                    >
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
                     </select>
                 </div>
                 <button

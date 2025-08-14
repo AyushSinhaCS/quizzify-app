@@ -14,7 +14,6 @@ const QuizPage = () => {
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
 
-    // Get the refreshUser function from the context
     const { user, refreshUser } = useContext(AuthContext);
 
     useEffect(() => {
@@ -25,7 +24,8 @@ const QuizPage = () => {
                         Authorization: `Bearer ${user.token}`,
                     },
                 };
-                const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/quizzes/${id}`, config);
+                // CORRECTED API PATH
+                const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/quizzes/${id}`, config);
                 setQuiz(data);
                 setLoading(false);
             } catch (err) {
@@ -46,8 +46,9 @@ const QuizPage = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
+            // CORRECTED API PATH
             await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/quizzes/submit`,
+                `${process.env.REACT_APP_API_URL}/quizzes/submit`,
                 {
                     quizId: id,
                     score: finalScore,
@@ -55,7 +56,6 @@ const QuizPage = () => {
                 },
                 config
             );
-            // After successful submission, immediately refresh the user data
             await refreshUser();
         } catch (err) {
             console.error("--- ERROR submitting score ---", err);
@@ -79,7 +79,7 @@ const QuizPage = () => {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setShowResult(true);
-            submitScore(newScore); // This now also triggers the user refresh
+            submitScore(newScore);
         }
     };
 

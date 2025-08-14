@@ -6,12 +6,10 @@ import { FiAward, FiBarChart2, FiZap, FiPlusCircle, FiCheckCircle } from 'react-
 
 const DashboardPage = () => {
   const { user } = useContext(AuthContext);
-  // This component will now manage its own state for the user's data
   const [dashboardUser, setDashboardUser] = useState(user);
   const location = useLocation();
 
   useEffect(() => {
-    // This function fetches the most up-to-date user profile from the server
     const fetchUserData = async () => {
       if (!user?.token) return;
       try {
@@ -20,8 +18,8 @@ const DashboardPage = () => {
             Authorization: `Bearer ${user.token}`,
           },
         };
-        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/me`, config);
-        // Set the component's local state with the new data, forcing a re-render
+        // CORRECTED API PATH
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/auth/me`, config);
         setDashboardUser(data);
       } catch (error) {
         console.error("Failed to fetch latest user data", error);
@@ -29,7 +27,7 @@ const DashboardPage = () => {
     };
 
     fetchUserData();
-  }, [location, user?.token]); // Reruns when you navigate to the page
+  }, [location, user?.token]);
 
   if (!dashboardUser) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -48,7 +46,6 @@ const DashboardPage = () => {
         </Link>
       </div>
       
-      {/* Stat Cards */}
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <div className="p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl shadow-lg flex items-center transition-all transform hover:-translate-y-1 hover:shadow-2xl">
           <FiZap className="text-yellow-400 text-4xl mr-4" />
@@ -73,7 +70,6 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Recent Quizzes Section */}
       <div>
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Recent Activity</h2>
         <div className="p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl shadow-lg">
