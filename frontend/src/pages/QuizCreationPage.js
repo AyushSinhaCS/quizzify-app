@@ -25,7 +25,7 @@ const QuizCreationPage = () => {
                 },
             };
 
-            // CORRECTED API PATH - ensures '/api' is included
+            // This line ensures '/api' is correctly added to the request URL
             const { data } = await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/quizzes/generate`,
                 { topic, numQuestions, difficulty },
@@ -44,7 +44,7 @@ const QuizCreationPage = () => {
     return (
         <div className="max-w-md mx-auto mt-10 p-8 border rounded-lg shadow-lg bg-white dark:bg-gray-800">
             <h2 className="text-2xl font-bold text-center mb-6">Create a New Quiz</h2>
-            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+            {error && <p className="text-red-red-500 text-center mb-4">{error}</p>}
             <form onSubmit={handleGenerateQuiz}>
                 <div className="mb-4">
                     <label htmlFor="topic" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
