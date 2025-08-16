@@ -14,6 +14,11 @@ const quizAttemptSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  // New field to store the user's answers
+  userAnswers: [{
+    questionIndex: Number,
+    selectedAnswer: String,
+  }],
   date: {
     type: Date,
     default: Date.now,
@@ -49,7 +54,7 @@ const userSchema = mongoose.Schema(
         date: Date,
       },
     ],
-    quizHistory: [quizAttemptSchema], // Added this line
+    quizHistory: [quizAttemptSchema],
   },
   {
     timestamps: true,

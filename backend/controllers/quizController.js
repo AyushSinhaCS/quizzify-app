@@ -77,37 +77,28 @@ const getQuizById = asyncHandler(async (req, res) => {
 // @route   POST /api/quizzes/submit
 // @access  Private
 const submitQuiz = asyncHandler(async (req, res) => {
-  const { quizId, score, totalQuestions } = req.body;
+  // Now also accepting userAnswers
+  const { quizId, score, totalQuestions, userAnswers } = req.body;
   const user = await User.findById(req.user._id);
 
   if (user) {
-    // Add attempt to user's history
-    user.quizHistory.push({ quizId, score, totalQuestions });
+    // Add attempt to user's history, now including answers
+    user.quizHistory.push({ quizId, score, totalQuestions, userAnswers });
     
-    // --- NEW GAMIFICATION LOGIC ---
-
-    // 1. Add experience points
     const earnedXp = score * 10;
     user.xp += earnedXp;
 
-    // 2. Check for level up (every 100 XP)
     const currentLevel = Math.floor(user.xp / 100) + 1;
     if (currentLevel > user.level) {
         user.level = currentLevel;
-        // You could add a notification here in a real app
     }
 
-    // 3. Check for badges
-    // Badge: First Quiz
     if (user.quizHistory.length === 1 && !user.badges.some(b => b.name === "First Quiz")) {
         user.badges.push({ name: "First Quiz", date: new Date() });
     }
-    // Badge: Perfect Score
     if (score === totalQuestions && !user.badges.some(b => b.name === "Perfect Score")) {
         user.badges.push({ name: "Perfect Score", date: new Date() });
     }
-
-    // --- END OF GAMIFICATION LOGIC ---
     
     await user.save();
     res.status(200).json({ message: 'Quiz submitted successfully' });
@@ -117,5 +108,27 @@ const submitQuiz = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Get data for a quiz review
+// @route   GET /api/quizzes/review/:attemptId
+// @access  Private
+const getQuizReview = asyncHandler(async (req, res) => {
+    const { attemptId } = req.params;
+    const user = await User.findById(req.user._id).populate('quizHistory.quizId');
 
-export { generateQuiz, getQuizById, submitQuiz };
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    const attempt = user.quizHistory.id(attemptId);
+
+    if (!attempt) {
+        res.status(404);
+        throw new Error('Quiz attempt not found');
+    }
+
+    res.status(200).json(attempt);
+});
+
+
+export { generateQuiz, getQuizById, submitQuiz, getQuizReview };
