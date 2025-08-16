@@ -3,6 +3,7 @@ const router = express.Router();
 import { getUserProfile } from '../controllers/userController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
-router.route('/profile').get(protect, getUserProfile);
+// Add /api prefix to all routes
+router.route('/api/users/profile').get(protect, getUserProfile);
 
 export default router;

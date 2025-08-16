@@ -7,8 +7,9 @@ import {
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
-router.post('/register', registerUser);
-router.post('/login', loginUser);
-router.get('/me', protect, getMe);
+// Add /api prefix to all routes
+router.post('/api/auth/register', registerUser);
+router.post('/api/auth/login', loginUser);
+router.get('/api/auth/me', protect, getMe);
 
 export default router;
