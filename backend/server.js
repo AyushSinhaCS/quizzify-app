@@ -1,11 +1,3 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, './.env') });
-
 import express from 'express';
 import cors from 'cors';
 import connectDB from './config/db.js';
@@ -20,29 +12,20 @@ connectDB();
 const app = express();
 
 // --- DEFINITIVE CORS CONFIGURATION ---
-const corsOptions = {
-  origin: 'https://quizzifyt.netlify.app',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204
-};
-
-app.use(cors(corsOptions));
+app.use(cors({ origin: 'https://quizzifyt.netlify.app' }));
 // --- END OF NEW CONFIGURATION ---
-
 
 app.use(express.json());
 
 // This is a simple check to make sure the server is reachable
 app.get('/', (req, res) => {
-  res.send('API is running and CORS is configured!');
+  res.send('API is running and ready!');
 });
 
-// API Routes
-app.use('/api/quizzes', quizRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-
+// Use the routers directly. The full path is now in the route files.
+app.use(quizRoutes);
+app.use(authRoutes);
+app.use(userRoutes);
 
 // Error Handling Middleware
 app.use(notFound);
