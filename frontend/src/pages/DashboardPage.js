@@ -8,8 +8,9 @@ const DashboardPage = () => {
   const location = useLocation();
 
   useEffect(() => {
+    // When the component loads or the URL changes, refresh the user data
     refreshUser();
-  }, [location]);
+  }, [location, refreshUser]); // Added refreshUser to the dependency array
 
   if (!user) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -60,7 +61,6 @@ const DashboardPage = () => {
           {user.quizHistory && user.quizHistory.length > 0 ? (
             <ul className="space-y-4">
               {user.quizHistory.slice().reverse().slice(0, 5).map((attempt) => (
-                // Wrap the list item in a Link component
                 <Link to={`/review/${attempt._id}`} key={attempt._id}>
                     <li className="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md">
                     <FiCheckCircle className="text-green-500 text-2xl mr-4"/>
