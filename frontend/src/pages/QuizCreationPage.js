@@ -25,9 +25,9 @@ const QuizCreationPage = () => {
                 },
             };
 
-            // CORRECTED API PATH
+            // CORRECTED API PATH - ensures '/api' is included
             const { data } = await axios.post(
-                `${process.env.REACT_APP_API_URL}/quizzes/generate`,
+                `${process.env.REACT_APP_API_URL}/api/quizzes/generate`,
                 { topic, numQuestions, difficulty },
                 config
             );
