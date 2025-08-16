@@ -18,10 +18,10 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Use the routers without the '/api' prefix
-app.use('/quizzes', quizRoutes);
-app.use('/auth', authRoutes);
-app.use('/users', userRoutes);
+// Use the correct base paths for all routers
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
