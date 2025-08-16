@@ -15,7 +15,7 @@ const LoginPage = () => {
     setError('');
     try {
       // CORRECTED API PATH
-      const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
         email,
         password,
       });
