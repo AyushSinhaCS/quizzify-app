@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Quiz from '../models/quizModel.js';
 import User from '../models/userModel.js';
 
-// ... (generateQuiz and getQuizById functions remain the same) ...
+// ... (generateQuiz function remains the same) ...
 const generateQuiz = asyncHandler(async (req, res) => {
   const { topic, numQuestions = 5, difficulty = 'medium' } = req.body;
 
@@ -61,28 +61,31 @@ const generateQuiz = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Get a quiz by ID
+// @route   GET /api/quizzes/:id
+// @access  Private
 const getQuizById = asyncHandler(async (req, res) => {
+    // --- NEW DEBUGGING LINE ---
+    console.log(`Attempting to find quiz with ID: ${req.params.id}`);
+
     const quiz = await Quiz.findById(req.params.id);
 
     if (quiz) {
+        console.log("Quiz found successfully!");
         res.json(quiz);
     } else {
+        console.log("Quiz NOT found in the database.");
         res.status(404);
         throw new Error('Quiz not found');
     }
 });
 
-
-// @desc    Submit a quiz score
-// @route   POST /api/quizzes/submit
-// @access  Private
+// ... (submitQuiz and getQuizReview functions remain the same) ...
 const submitQuiz = asyncHandler(async (req, res) => {
-  // Now also accepting userAnswers
   const { quizId, score, totalQuestions, userAnswers } = req.body;
   const user = await User.findById(req.user._id);
 
   if (user) {
-    // Add attempt to user's history, now including answers
     user.quizHistory.push({ quizId, score, totalQuestions, userAnswers });
     
     const earnedXp = score * 10;
@@ -108,9 +111,6 @@ const submitQuiz = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get data for a quiz review
-// @route   GET /api/quizzes/review/:attemptId
-// @access  Private
 const getQuizReview = asyncHandler(async (req, res) => {
     const { attemptId } = req.params;
     const user = await User.findById(req.user._id).populate('quizHistory.quizId');
@@ -129,6 +129,5 @@ const getQuizReview = asyncHandler(async (req, res) => {
 
     res.status(200).json(attempt);
 });
-
 
 export { generateQuiz, getQuizById, submitQuiz, getQuizReview };
