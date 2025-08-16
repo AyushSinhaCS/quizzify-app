@@ -3,9 +3,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Quiz from '../models/quizModel.js';
 import User from '../models/userModel.js';
 
-// @desc    Generate a quiz
-// @route   POST /api/quizzes/generate
-// @access  Private
 const generateQuiz = asyncHandler(async (req, res) => {
   const { topic, numQuestions = 5, difficulty = 'medium' } = req.body;
 
@@ -28,14 +25,6 @@ const generateQuiz = asyncHandler(async (req, res) => {
   
   Format the output as a valid JSON array of objects, where each object has "question", "options" (an array of strings), and "correctAnswer" (a string like "C").
   Do not include any text before or after the JSON array.
-  Example:
-  [
-    {
-      "question": "What is the capital of France?",
-      "options": ["London", "Berlin", "Paris", "Madrid"],
-      "correctAnswer": "C"
-    }
-  ]
   `;
 
   try {
@@ -44,7 +33,6 @@ const generateQuiz = asyncHandler(async (req, res) => {
     let quizDataText = response.text();
     
     quizDataText = quizDataText.replace(/```json/g, '').replace(/```/g, '').trim();
-
     const quizData = JSON.parse(quizDataText);
 
     const newQuiz = await Quiz.create({
@@ -63,12 +51,8 @@ const generateQuiz = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get a quiz by ID
-// @route   GET /api/quizzes/:id
-// @access  Private
 const getQuizById = asyncHandler(async (req, res) => {
     const quiz = await Quiz.findById(req.params.id);
-
     if (quiz) {
         res.json(quiz);
     } else {

@@ -11,21 +11,19 @@ connectDB();
 
 const app = express();
 
-// --- DEFINITIVE CORS CONFIGURATION ---
-app.use(cors({ origin: 'https://quizzifyt.netlify.app' }));
-// --- END OF NEW CONFIGURATION ---
+// Use a simple CORS configuration for Render
+app.use(cors());
 
 app.use(express.json());
 
-// This is a simple check to make sure the server is reachable
 app.get('/', (req, res) => {
-  res.send('API is running and ready!');
+  res.send('API is running...');
 });
 
-// Use the routers directly. The full path is now in the route files.
-app.use(quizRoutes);
-app.use(authRoutes);
-app.use(userRoutes);
+// Original API Route structure
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Error Handling Middleware
 app.use(notFound);
@@ -34,6 +32,3 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, console.log(`Server running on port ${PORT}`));
-
-// Export the app for Vercel
-export default app;
