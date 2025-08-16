@@ -13,9 +13,8 @@ const QuizPage = () => {
     const [score, setScore] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
-    const [userAnswers, setUserAnswers] = useState([]); // New state to track answers
 
-    const { user, refreshUser } = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchQuiz = async () => {
@@ -38,43 +37,13 @@ const QuizPage = () => {
         }
     }, [id, user?.token]);
 
-    const submitScore = async (finalScore, finalAnswers) => {
-        try {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${user.token}`,
-                },
-            };
-            await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/quizzes/submit`,
-                {
-                    quizId: id,
-                    score: finalScore,
-                    totalQuestions: quiz.questions.length,
-                    userAnswers: finalAnswers, // Send answers to backend
-                },
-                config
-            );
-            await refreshUser();
-        } catch (err) {
-            console.error("--- ERROR submitting score ---", err);
-        }
-    };
-
     const handleAnswerSelect = (option) => {
         setSelectedAnswer(option);
     };
     
     const handleNextQuestion = () => {
-        // Record the user's answer
-        const newAnswers = [...userAnswers, { questionIndex: currentQuestionIndex, selectedAnswer }];
-        setUserAnswers(newAnswers);
-
-        let newScore = score;
         if (selectedAnswer === quiz.questions[currentQuestionIndex].correctAnswer) {
-            newScore = score + 1;
-            setScore(newScore);
+            setScore(score + 1);
         }
 
         setSelectedAnswer(null);
@@ -83,7 +52,6 @@ const QuizPage = () => {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setShowResult(true);
-            submitScore(newScore, newAnswers);
         }
     };
 
@@ -125,7 +93,7 @@ const QuizPage = () => {
                         onClick={() => handleAnswerSelect(optionLetters[index])}
                         className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${selectedAnswer === optionLetters[index] ? 'bg-purple-200 border-purple-500 dark:bg-purple-900' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600'}`}
                     >
-                        <span className="font-bold mr-2">{optionLetters[index]}.</span> {option}
+                        <span className="font-bold mr-2">{letter}.</span> {option}
                     </button>
                 ))}
             </div>

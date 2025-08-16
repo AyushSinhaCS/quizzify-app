@@ -1,30 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-const quizAttemptSchema = mongoose.Schema({
-  quizId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Quiz',
-  },
-  score: {
-    type: Number,
-    required: true,
-  },
-  totalQuestions: {
-    type: Number,
-    required: true,
-  },
-  // New field to store the user's answers
-  userAnswers: [{
-    questionIndex: Number,
-    selectedAnswer: String,
-  }],
-  date: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -54,7 +30,6 @@ const userSchema = mongoose.Schema(
         date: Date,
       },
     ],
-    quizHistory: [quizAttemptSchema],
   },
   {
     timestamps: true,

@@ -3,7 +3,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Quiz from '../models/quizModel.js';
 import User from '../models/userModel.js';
 
-// ... (generateQuiz function remains the same) ...
+// @desc    Generate a quiz
+// @route   POST /api/quizzes/generate
+// @access  Private
 const generateQuiz = asyncHandler(async (req, res) => {
   const { topic, numQuestions = 5, difficulty = 'medium' } = req.body;
 
@@ -65,69 +67,14 @@ const generateQuiz = asyncHandler(async (req, res) => {
 // @route   GET /api/quizzes/:id
 // @access  Private
 const getQuizById = asyncHandler(async (req, res) => {
-    // --- NEW DEBUGGING LINE ---
-    console.log(`Attempting to find quiz with ID: ${req.params.id}`);
-
     const quiz = await Quiz.findById(req.params.id);
 
     if (quiz) {
-        console.log("Quiz found successfully!");
         res.json(quiz);
     } else {
-        console.log("Quiz NOT found in the database.");
         res.status(404);
         throw new Error('Quiz not found');
     }
 });
 
-// ... (submitQuiz and getQuizReview functions remain the same) ...
-const submitQuiz = asyncHandler(async (req, res) => {
-  const { quizId, score, totalQuestions, userAnswers } = req.body;
-  const user = await User.findById(req.user._id);
-
-  if (user) {
-    user.quizHistory.push({ quizId, score, totalQuestions, userAnswers });
-    
-    const earnedXp = score * 10;
-    user.xp += earnedXp;
-
-    const currentLevel = Math.floor(user.xp / 100) + 1;
-    if (currentLevel > user.level) {
-        user.level = currentLevel;
-    }
-
-    if (user.quizHistory.length === 1 && !user.badges.some(b => b.name === "First Quiz")) {
-        user.badges.push({ name: "First Quiz", date: new Date() });
-    }
-    if (score === totalQuestions && !user.badges.some(b => b.name === "Perfect Score")) {
-        user.badges.push({ name: "Perfect Score", date: new Date() });
-    }
-    
-    await user.save();
-    res.status(200).json({ message: 'Quiz submitted successfully' });
-  } else {
-    res.status(404);
-    throw new Error('User not found');
-  }
-});
-
-const getQuizReview = asyncHandler(async (req, res) => {
-    const { attemptId } = req.params;
-    const user = await User.findById(req.user._id).populate('quizHistory.quizId');
-
-    if (!user) {
-        res.status(404);
-        throw new Error('User not found');
-    }
-
-    const attempt = user.quizHistory.id(attemptId);
-
-    if (!attempt) {
-        res.status(404);
-        throw new Error('Quiz attempt not found');
-    }
-
-    res.status(200).json(attempt);
-});
-
-export { generateQuiz, getQuizById, submitQuiz, getQuizReview };
+export { generateQuiz, getQuizById };

@@ -5,7 +5,6 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import QuizPage from './pages/QuizPage';
-import QuizReviewPage from './pages/QuizReviewPage'; // Import the new page
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import { AuthProvider } from './context/AuthContext';
@@ -26,8 +25,6 @@ function App() {
               <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
               <Route path="/create-quiz" element={<PrivateRoute><QuizCreationPage /></PrivateRoute>} />
               <Route path="/quiz/:id" element={<PrivateRoute><QuizPage /></PrivateRoute>} />
-              {/* Add the new route for the review page */}
-              <Route path="/review/:attemptId" element={<PrivateRoute><QuizReviewPage /></PrivateRoute>} />
             </Routes>
           </main>
           <Footer />
