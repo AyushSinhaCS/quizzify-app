@@ -61,4 +61,5 @@ const getQuizById = asyncHandler(async (req, res) => {
     }
 });
 
+// We are only exporting the functions that exist in this stable version
 export { generateQuiz, getQuizById };
