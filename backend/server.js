@@ -11,21 +11,18 @@ connectDB();
 
 const app = express();
 
-// Use a simple CORS configuration for Render
 app.use(cors());
-
 app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Original API Route structure
+// Use the correct base paths for the routers
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
-// Error Handling Middleware
 app.use(notFound);
 app.use(errorHandler);
 
