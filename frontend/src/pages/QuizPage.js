@@ -93,7 +93,8 @@ const QuizPage = () => {
                         onClick={() => handleAnswerSelect(optionLetters[index])}
                         className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${selectedAnswer === optionLetters[index] ? 'bg-purple-200 border-purple-500 dark:bg-purple-900' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600'}`}
                     >
-                        <span className="font-bold mr-2">{letter}.</span> {option}
+                        {/* CORRECTED LINE: Changed 'letter' to 'optionLetters[index]' */}
+                        <span className="font-bold mr-2">{optionLetters[index]}.</span> {option}
                     </button>
                 ))}
             </div>
