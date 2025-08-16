@@ -13,6 +13,7 @@ const QuizPage = () => {
     const [score, setScore] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
+    const [userAnswers, setUserAnswers] = useState([]); // New state to track answers
 
     const { user, refreshUser } = useContext(AuthContext);
 
@@ -24,8 +25,7 @@ const QuizPage = () => {
                         Authorization: `Bearer ${user.token}`,
                     },
                 };
-                // CORRECTED API PATH
-                const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/quizzes/${id}`, config);
+                const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/quizzes/${id}`, config);
                 setQuiz(data);
                 setLoading(false);
             } catch (err) {
@@ -38,7 +38,7 @@ const QuizPage = () => {
         }
     }, [id, user?.token]);
 
-    const submitScore = async (finalScore) => {
+    const submitScore = async (finalScore, finalAnswers) => {
         try {
             const config = {
                 headers: {
@@ -46,13 +46,13 @@ const QuizPage = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            // CORRECTED API PATH
             await axios.post(
-                `${process.env.REACT_APP_API_URL}/quizzes/submit`,
+                `${process.env.REACT_APP_API_URL}/api/quizzes/submit`,
                 {
                     quizId: id,
                     score: finalScore,
                     totalQuestions: quiz.questions.length,
+                    userAnswers: finalAnswers, // Send answers to backend
                 },
                 config
             );
@@ -67,6 +67,10 @@ const QuizPage = () => {
     };
     
     const handleNextQuestion = () => {
+        // Record the user's answer
+        const newAnswers = [...userAnswers, { questionIndex: currentQuestionIndex, selectedAnswer }];
+        setUserAnswers(newAnswers);
+
         let newScore = score;
         if (selectedAnswer === quiz.questions[currentQuestionIndex].correctAnswer) {
             newScore = score + 1;
@@ -79,7 +83,7 @@ const QuizPage = () => {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setShowResult(true);
-            submitScore(newScore);
+            submitScore(newScore, newAnswers);
         }
     };
 
