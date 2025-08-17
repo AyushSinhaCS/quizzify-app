@@ -38,12 +38,6 @@ const QuizPage = () => {
     }, [id, user?.token]);
 
     const submitScore = async (finalScore, finalAnswers) => {
-        console.log("--- SUBMITTING SCORE ---");
-        console.log("Quiz ID:", id);
-        console.log("Final Score:", finalScore);
-        console.log("Topic:", quiz.topic);
-        console.log("Answers:", finalAnswers);
-
         try {
             const config = {
                 headers: {
@@ -57,16 +51,14 @@ const QuizPage = () => {
                     quizId: id,
                     score: finalScore,
                     totalQuestions: quiz.questions.length,
-                    topic: quiz.topic,
+                    topic: quiz.topic, // This line sends the topic
                     userAnswers: finalAnswers,
                 },
                 config
             );
-            console.log("--- SCORE SUBMITTED SUCCESSFULLY ---");
             await refreshUser();
-            console.log("--- USER PROFILE REFRESHED ---");
         } catch (err) {
-            console.error("--- ERROR SUBMITTING SCORE ---", err);
+            console.error("Error submitting score:", err);
             alert("There was an error submitting your score. Please check the console for details.");
         }
     };
