@@ -13,12 +13,13 @@ const QuizPage = () => {
     const [score, setScore] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
-    const [userAnswers, setUserAnswers] = useState([]); // New state to track answers
+    const [userAnswers, setUserAnswers] = useState([]);
 
     const { user, refreshUser } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchQuiz = async () => {
+            if (!user?.token) return;
             try {
                 const config = {
                     headers: {
@@ -33,12 +34,16 @@ const QuizPage = () => {
                 setLoading(false);
             }
         };
-        if (user?.token) {
-            fetchQuiz();
-        }
+        fetchQuiz();
     }, [id, user?.token]);
 
     const submitScore = async (finalScore, finalAnswers) => {
+        console.log("--- SUBMITTING SCORE ---");
+        console.log("Quiz ID:", id);
+        console.log("Final Score:", finalScore);
+        console.log("Topic:", quiz.topic);
+        console.log("Answers:", finalAnswers);
+
         try {
             const config = {
                 headers: {
@@ -53,13 +58,16 @@ const QuizPage = () => {
                     score: finalScore,
                     totalQuestions: quiz.questions.length,
                     topic: quiz.topic,
-                    userAnswers: finalAnswers, // Send answers to backend
+                    userAnswers: finalAnswers,
                 },
                 config
             );
+            console.log("--- SCORE SUBMITTED SUCCESSFULLY ---");
             await refreshUser();
+            console.log("--- USER PROFILE REFRESHED ---");
         } catch (err) {
-            console.error("--- ERROR submitting score ---", err);
+            console.error("--- ERROR SUBMITTING SCORE ---", err);
+            alert("There was an error submitting your score. Please check the console for details.");
         }
     };
 
@@ -68,7 +76,6 @@ const QuizPage = () => {
     };
     
     const handleNextQuestion = () => {
-        // Record the user's answer
         const newAnswers = [...userAnswers, { questionIndex: currentQuestionIndex, selectedAnswer }];
         setUserAnswers(newAnswers);
 
