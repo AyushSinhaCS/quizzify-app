@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Quiz from '../models/quizModel.js';
 import User from '../models/userModel.js';
 
+// ... (generateQuiz and getQuizById functions remain the same) ...
 const generateQuiz = asyncHandler(async (req, res) => {
   const { topic, numQuestions = 5, difficulty = 'medium' } = req.body;
 
@@ -61,13 +62,19 @@ const getQuizById = asyncHandler(async (req, res) => {
     }
 });
 
+
 const submitQuiz = asyncHandler(async (req, res) => {
     const { quizId, score, totalQuestions, topic, userAnswers } = req.body;
     const user = await User.findById(req.user._id);
   
     if (user) {
+      console.log(`--- SUBMIT QUIZ ---`);
+      console.log(`Before update, user quizHistory length: ${user.quizHistory.length}`);
+
       user.quizHistory.push({ quizId, score, totalQuestions, topic, userAnswers });
       
+      console.log(`After update, user quizHistory length: ${user.quizHistory.length}`);
+
       const earnedXp = score * 10;
       user.xp += earnedXp;
   
@@ -83,7 +90,9 @@ const submitQuiz = asyncHandler(async (req, res) => {
           user.badges.push({ name: "Perfect Score", date: new Date() });
       }
       
-      await user.save();
+      const updatedUser = await user.save();
+      
+      console.log(`After SAVE, updatedUser quizHistory length: ${updatedUser.quizHistory.length}`);
       res.status(200).json({ message: 'Quiz submitted successfully' });
     } else {
       res.status(404);

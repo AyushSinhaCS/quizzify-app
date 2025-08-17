@@ -2,16 +2,13 @@ import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 
-// Generate JWT
+// ... (registerUser and loginUser functions remain the same) ...
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: '30d',
   });
 };
 
-// @desc    Register new user
-// @route   POST /api/auth/register
-// @access  Public
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -50,9 +47,6 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Authenticate a user
-// @route   POST /api/auth/login
-// @access  Public
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -75,12 +69,16 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
+
 // @desc    Get user data
 // @route   GET /api/auth/me
 // @access  Private
 const getMe = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (user) {
+        // --- NEW DEBUGGING LINE ---
+        console.log(`--- GET ME ---`);
+        console.log(`Fetching user profile. Quiz history length: ${user.quizHistory.length}`);
         res.status(200).json(user);
     } else {
         res.status(404);
