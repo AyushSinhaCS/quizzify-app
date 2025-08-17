@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Quiz from '../models/quizModel.js';
 import User from '../models/userModel.js';
 
+// ... (generateQuiz, getQuizById, and submitQuiz functions remain the same) ...
 const generateQuiz = asyncHandler(async (req, res) => {
   const { topic, numQuestions = 5, difficulty = 'medium' } = req.body;
 
@@ -32,9 +33,7 @@ const generateQuiz = asyncHandler(async (req, res) => {
     const response = await result.response;
     let quizDataText = response.text();
     
-    // CORRECTED LINE
-    quizDataText = quizDataText.replace(/```json/g, '').replace(/```/g, '').trim();
-
+    quizDataText = quizDataText.replace(/```json/g, '').replace(/```g, '').trim();
     const quizData = JSON.parse(quizDataText);
 
     const newQuiz = await Quiz.create({
@@ -64,11 +63,11 @@ const getQuizById = asyncHandler(async (req, res) => {
 });
 
 const submitQuiz = asyncHandler(async (req, res) => {
-    const { quizId, score, totalQuestions, topic } = req.body;
+    const { quizId, score, totalQuestions, topic, userAnswers } = req.body;
     const user = await User.findById(req.user._id);
   
     if (user) {
-      user.quizHistory.push({ quizId, score, totalQuestions, topic });
+      user.quizHistory.push({ quizId, score, totalQuestions, topic, userAnswers });
       
       const earnedXp = score * 10;
       user.xp += earnedXp;
@@ -93,4 +92,33 @@ const submitQuiz = asyncHandler(async (req, res) => {
     }
   });
 
-export { generateQuiz, getQuizById, submitQuiz };
+const getQuizReview = async (req, res) => {
+    try {
+        console.log("--- GET QUIZ REVIEW ---");
+        const { attemptId } = req.params;
+        const user = await User.findById(req.user._id).populate('quizHistory.quizId');
+
+        if (!user) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        const attempt = user.quizHistory.id(attemptId);
+
+        if (!attempt) {
+            res.status(404);
+            throw new Error('Quiz attempt not found');
+        }
+
+        console.log("--- Found quiz attempt successfully ---");
+        res.status(200).json(attempt);
+    } catch (error) {
+        // --- THIS WILL CATCH THE HIDDEN ERROR ---
+        console.error("--- CRITICAL ERROR IN GETQUIZREVIEW ---");
+        console.error(error);
+        res.status(500).json({ message: "A critical error occurred on the server while fetching the review." });
+    }
+};
+
+
+export { generateQuiz, getQuizById, submitQuiz, getQuizReview };
