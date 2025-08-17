@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Function to refresh user data from the server
   const refreshUser = async () => {
     if (!user?.token) return;
     try {
@@ -41,8 +42,10 @@ export const AuthProvider = ({ children }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      // CORRECTED API PATH
-      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/auth/me`, config);
+      // --- CACHE-BUSTING FIX ---
+      // Added a unique timestamp to the URL to prevent browser caching
+      const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/me?t=${new Date().getTime()}`, config);
+      
       login({ ...data, token: user.token });
     } catch (error) {
       console.error("Failed to refresh user data", error);
