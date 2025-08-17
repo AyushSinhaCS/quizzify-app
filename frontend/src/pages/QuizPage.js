@@ -13,6 +13,7 @@ const QuizPage = () => {
     const [score, setScore] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
+    const [userAnswers, setUserAnswers] = useState([]); // New state to track answers
 
     const { user, refreshUser } = useContext(AuthContext);
 
@@ -37,7 +38,7 @@ const QuizPage = () => {
         }
     }, [id, user?.token]);
 
-    const submitScore = async (finalScore) => {
+    const submitScore = async (finalScore, finalAnswers) => {
         try {
             const config = {
                 headers: {
@@ -51,7 +52,8 @@ const QuizPage = () => {
                     quizId: id,
                     score: finalScore,
                     totalQuestions: quiz.questions.length,
-                    topic: quiz.topic // Send the topic
+                    topic: quiz.topic,
+                    userAnswers: finalAnswers, // Send answers to backend
                 },
                 config
             );
@@ -66,6 +68,10 @@ const QuizPage = () => {
     };
     
     const handleNextQuestion = () => {
+        // Record the user's answer
+        const newAnswers = [...userAnswers, { questionIndex: currentQuestionIndex, selectedAnswer }];
+        setUserAnswers(newAnswers);
+
         let newScore = score;
         if (selectedAnswer === quiz.questions[currentQuestionIndex].correctAnswer) {
             newScore = score + 1;
@@ -78,7 +84,7 @@ const QuizPage = () => {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setShowResult(true);
-            submitScore(newScore);
+            submitScore(newScore, newAnswers);
         }
     };
 
