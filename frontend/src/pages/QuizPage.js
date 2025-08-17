@@ -14,7 +14,7 @@ const QuizPage = () => {
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
 
-    const { user } = useContext(AuthContext);
+    const { user, refreshUser } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchQuiz = async () => {
@@ -37,13 +37,39 @@ const QuizPage = () => {
         }
     }, [id, user?.token]);
 
+    const submitScore = async (finalScore) => {
+        try {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/quizzes/submit`,
+                {
+                    quizId: id,
+                    score: finalScore,
+                    totalQuestions: quiz.questions.length,
+                    topic: quiz.topic // Send the topic
+                },
+                config
+            );
+            await refreshUser();
+        } catch (err) {
+            console.error("--- ERROR submitting score ---", err);
+        }
+    };
+
     const handleAnswerSelect = (option) => {
         setSelectedAnswer(option);
     };
     
     const handleNextQuestion = () => {
+        let newScore = score;
         if (selectedAnswer === quiz.questions[currentQuestionIndex].correctAnswer) {
-            setScore(score + 1);
+            newScore = score + 1;
+            setScore(newScore);
         }
 
         setSelectedAnswer(null);
@@ -52,6 +78,7 @@ const QuizPage = () => {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             setShowResult(true);
+            submitScore(newScore);
         }
     };
 
@@ -93,7 +120,6 @@ const QuizPage = () => {
                         onClick={() => handleAnswerSelect(optionLetters[index])}
                         className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${selectedAnswer === optionLetters[index] ? 'bg-purple-200 border-purple-500 dark:bg-purple-900' : 'bg-gray-100 border-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600'}`}
                     >
-                        {/* CORRECTED LINE: Changed 'letter' to 'optionLetters[index]' */}
                         <span className="font-bold mr-2">{optionLetters[index]}.</span> {option}
                     </button>
                 ))}

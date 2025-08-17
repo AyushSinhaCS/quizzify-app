@@ -61,5 +61,35 @@ const getQuizById = asyncHandler(async (req, res) => {
     }
 });
 
-// We are only exporting the functions that exist in this stable version
-export { generateQuiz, getQuizById };
+const submitQuiz = asyncHandler(async (req, res) => {
+    const { quizId, score, totalQuestions, topic } = req.body;
+    const user = await User.findById(req.user._id);
+  
+    if (user) {
+      // Add attempt to user's history
+      user.quizHistory.push({ quizId, score, totalQuestions, topic });
+      
+      const earnedXp = score * 10;
+      user.xp += earnedXp;
+  
+      const currentLevel = Math.floor(user.xp / 100) + 1;
+      if (currentLevel > user.level) {
+          user.level = currentLevel;
+      }
+  
+      if (user.quizHistory.length === 1 && !user.badges.some(b => b.name === "First Quiz")) {
+          user.badges.push({ name: "First Quiz", date: new Date() });
+      }
+      if (score === totalQuestions && !user.badges.some(b => b.name === "Perfect Score")) {
+          user.badges.push({ name: "Perfect Score", date: new Date() });
+      }
+      
+      await user.save();
+      res.status(200).json({ message: 'Quiz submitted successfully' });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  });
+
+export { generateQuiz, getQuizById, submitQuiz };

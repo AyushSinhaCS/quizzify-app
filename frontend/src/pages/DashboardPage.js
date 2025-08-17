@@ -8,9 +8,8 @@ const DashboardPage = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // When the component loads or the URL changes, refresh the user data
     refreshUser();
-  }, [location, refreshUser]); // Added refreshUser to the dependency array
+  }, [location, refreshUser]);
 
   if (!user) {
     return <div className="text-center mt-10">Loading...</div>;
@@ -61,16 +60,14 @@ const DashboardPage = () => {
           {user.quizHistory && user.quizHistory.length > 0 ? (
             <ul className="space-y-4">
               {user.quizHistory.slice().reverse().slice(0, 5).map((attempt) => (
-                <Link to={`/review/${attempt._id}`} key={attempt._id}>
-                    <li className="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md">
-                    <FiCheckCircle className="text-green-500 text-2xl mr-4"/>
-                    <div className="flex-grow">
-                        <p className="font-semibold text-gray-700 dark:text-gray-200">Review Quiz</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(attempt.date).toLocaleDateString()}</p>
-                    </div>
-                    <p className="font-bold text-lg text-gray-800 dark:text-white">{attempt.score}/{attempt.totalQuestions}</p>
-                    </li>
-                </Link>
+                <li key={attempt._id} className="flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                  <FiCheckCircle className="text-green-500 text-2xl mr-4"/>
+                  <div className="flex-grow">
+                    <p className="font-semibold text-gray-700 dark:text-gray-200">Quiz on {attempt.topic}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(attempt.date).toLocaleDateString()}</p>
+                  </div>
+                  <p className="font-bold text-lg text-gray-800 dark:text-white">{attempt.score}/{attempt.totalQuestions}</p>
+                </li>
               ))}
             </ul>
           ) : (
