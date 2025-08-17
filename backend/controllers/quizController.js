@@ -62,12 +62,11 @@ const getQuizById = asyncHandler(async (req, res) => {
 });
 
 const submitQuiz = asyncHandler(async (req, res) => {
-    const { quizId, score, totalQuestions, topic } = req.body;
+    const { quizId, score, totalQuestions, topic, userAnswers } = req.body;
     const user = await User.findById(req.user._id);
   
     if (user) {
-      // Add attempt to user's history
-      user.quizHistory.push({ quizId, score, totalQuestions, topic });
+      user.quizHistory.push({ quizId, score, totalQuestions, topic, userAnswers });
       
       const earnedXp = score * 10;
       user.xp += earnedXp;
