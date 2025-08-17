@@ -13,13 +13,12 @@ const QuizPage = () => {
     const [score, setScore] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
-    const [userAnswers, setUserAnswers] = useState([]);
+    const [userAnswers, setUserAnswers] = useState([]); // New state to track answers
 
     const { user, refreshUser } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchQuiz = async () => {
-            if (!user?.token) return;
             try {
                 const config = {
                     headers: {
@@ -34,7 +33,9 @@ const QuizPage = () => {
                 setLoading(false);
             }
         };
-        fetchQuiz();
+        if (user?.token) {
+            fetchQuiz();
+        }
     }, [id, user?.token]);
 
     const submitScore = async (finalScore, finalAnswers) => {
@@ -51,15 +52,14 @@ const QuizPage = () => {
                     quizId: id,
                     score: finalScore,
                     totalQuestions: quiz.questions.length,
-                    topic: quiz.topic, // This line sends the topic
-                    userAnswers: finalAnswers,
+                    topic: quiz.topic,
+                    userAnswers: finalAnswers, // Send answers to backend
                 },
                 config
             );
             await refreshUser();
         } catch (err) {
-            console.error("Error submitting score:", err);
-            alert("There was an error submitting your score. Please check the console for details.");
+            console.error("--- ERROR submitting score ---", err);
         }
     };
 
@@ -68,6 +68,7 @@ const QuizPage = () => {
     };
     
     const handleNextQuestion = () => {
+        // Record the user's answer
         const newAnswers = [...userAnswers, { questionIndex: currentQuestionIndex, selectedAnswer }];
         setUserAnswers(newAnswers);
 
