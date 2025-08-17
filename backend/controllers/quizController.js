@@ -3,7 +3,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Quiz from '../models/quizModel.js';
 import User from '../models/userModel.js';
 
-// ... (generateQuiz and getQuizById functions remain the same) ...
 const generateQuiz = asyncHandler(async (req, res) => {
   const { topic, numQuestions = 5, difficulty = 'medium' } = req.body;
 
@@ -33,7 +32,9 @@ const generateQuiz = asyncHandler(async (req, res) => {
     const response = await result.response;
     let quizDataText = response.text();
     
-    quizDataText = quizDataText.replace(/```json/g, '').replace(/```g, '').trim();
+    // CORRECTED LINE
+    quizDataText = quizDataText.replace(/```json/g, '').replace(/```/g, '').trim();
+
     const quizData = JSON.parse(quizDataText);
 
     const newQuiz = await Quiz.create({
@@ -63,11 +64,11 @@ const getQuizById = asyncHandler(async (req, res) => {
 });
 
 const submitQuiz = asyncHandler(async (req, res) => {
-    const { quizId, score, totalQuestions, topic, userAnswers } = req.body;
+    const { quizId, score, totalQuestions, topic } = req.body;
     const user = await User.findById(req.user._id);
   
     if (user) {
-      user.quizHistory.push({ quizId, score, totalQuestions, topic, userAnswers });
+      user.quizHistory.push({ quizId, score, totalQuestions, topic });
       
       const earnedXp = score * 10;
       user.xp += earnedXp;
@@ -92,28 +93,4 @@ const submitQuiz = asyncHandler(async (req, res) => {
     }
   });
 
-// @desc    Get data for a quiz review
-// @route   GET /api/quizzes/review/:attemptId
-// @access  Private
-const getQuizReview = asyncHandler(async (req, res) => {
-    const { attemptId } = req.params;
-    // Find the user and populate the quiz details for each item in the quiz history
-    const user = await User.findById(req.user._id).populate('quizHistory.quizId');
-
-    if (!user) {
-        res.status(404);
-        throw new Error('User not found');
-    }
-
-    const attempt = user.quizHistory.id(attemptId);
-
-    if (!attempt) {
-        res.status(404);
-        throw new Error('Quiz attempt not found');
-    }
-
-    res.status(200).json(attempt);
-});
-
-
-export { generateQuiz, getQuizById, submitQuiz, getQuizReview };
+export { generateQuiz, getQuizById, submitQuiz };
