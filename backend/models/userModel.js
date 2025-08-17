@@ -8,7 +8,7 @@ const quizAttemptSchema = mongoose.Schema({
   },
   topic: {
     type: String,
-    required: true,
+    // required: true, // Making this optional to support old data
   },
   score: {
     type: Number,
@@ -18,7 +18,6 @@ const quizAttemptSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  // New field to store the user's answers
   userAnswers: [{
     questionIndex: Number,
     selectedAnswer: String,
