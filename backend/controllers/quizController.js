@@ -33,7 +33,7 @@ const generateQuiz = asyncHandler(async (req, res) => {
     const response = await result.response;
     let quizDataText = response.text();
     
-    quizDataText = quizDataText.replace(/```json/g, '').replace(/```/g, '').trim();
+    quizDataText = quizDataText.replace(/```json/g, '').replace(/```g, '').trim();
     const quizData = JSON.parse(quizDataText);
 
     const newQuiz = await Quiz.create({
@@ -62,43 +62,58 @@ const getQuizById = asyncHandler(async (req, res) => {
     }
 });
 
-
-const submitQuiz = async (req, res) => {
-    try {
-        console.log("Received submission data:", req.body);
-        const { quizId, score, totalQuestions, topic, userAnswers } = req.body;
-        const user = await User.findById(req.user._id);
+const submitQuiz = asyncHandler(async (req, res) => {
+    const { quizId, score, totalQuestions, topic, userAnswers } = req.body;
+    const user = await User.findById(req.user._id);
+  
+    if (user) {
+      user.quizHistory.push({ quizId, score, totalQuestions, topic, userAnswers });
       
-        if (user) {
-          user.quizHistory.push({ quizId, score, totalQuestions, topic, userAnswers });
-          
-          const earnedXp = score * 10;
-          user.xp += earnedXp;
+      const earnedXp = score * 10;
+      user.xp += earnedXp;
+  
+      const currentLevel = Math.floor(user.xp / 100) + 1;
+      if (currentLevel > user.level) {
+          user.level = currentLevel;
+      }
+  
+      if (user.quizHistory.length === 1 && !user.badges.some(b => b.name === "First Quiz")) {
+          user.badges.push({ name: "First Quiz", date: new Date() });
+      }
+      if (score === totalQuestions && !user.badges.some(b => b.name === "Perfect Score")) {
+          user.badges.push({ name: "Perfect Score", date: new Date() });
+      }
       
-          const currentLevel = Math.floor(user.xp / 100) + 1;
-          if (currentLevel > user.level) {
-              user.level = currentLevel;
-          }
-      
-          if (user.quizHistory.length === 1 && !user.badges.some(b => b.name === "First Quiz")) {
-              user.badges.push({ name: "First Quiz", date: new Date() });
-          }
-          if (score === totalQuestions && !user.badges.some(b => b.name === "Perfect Score")) {
-              user.badges.push({ name: "Perfect Score", date: new Date() });
-          }
-          
-          await user.save();
-          res.status(200).json({ message: 'Quiz submitted successfully' });
-        } else {
-          res.status(404).json({ message: 'User not found' });
-        }
-    } catch (error) {
-        // --- THIS WILL CATCH THE HIDDEN ERROR ---
-        console.error("--- CRITICAL ERROR IN SUBMITQUIZ ---");
-        console.error(error);
-        res.status(500).json({ message: "A critical error occurred on the server while submitting the quiz." });
+      await user.save();
+      res.status(200).json({ message: 'Quiz submitted successfully' });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
     }
-  };
+  });
 
-// We need to export this way because we are not using asyncHandler on the new submitQuiz
-export { generateQuiz, getQuizById, submitQuiz };
+// @desc    Get data for a quiz review
+// @route   GET /api/quizzes/review/:attemptId
+// @access  Private
+const getQuizReview = asyncHandler(async (req, res) => {
+    const { attemptId } = req.params;
+    // Find the user and populate the quiz details for each item in the quiz history
+    const user = await User.findById(req.user._id).populate('quizHistory.quizId');
+
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    const attempt = user.quizHistory.id(attemptId);
+
+    if (!attempt) {
+        res.status(404);
+        throw new Error('Quiz attempt not found');
+    }
+
+    res.status(200).json(attempt);
+});
+
+
+export { generateQuiz, getQuizById, submitQuiz, getQuizReview };
