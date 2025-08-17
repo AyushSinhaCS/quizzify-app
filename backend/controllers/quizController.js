@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import Quiz from '../models/quizModel.js';
 import User from '../models/userModel.js';
 
+// ... (generateQuiz, getQuizById, and submitQuiz functions remain the same) ...
 const generateQuiz = asyncHandler(async (req, res) => {
   const { topic, numQuestions = 5, difficulty = 'medium' } = req.body;
 
@@ -32,7 +33,6 @@ const generateQuiz = asyncHandler(async (req, res) => {
     const response = await result.response;
     let quizDataText = response.text();
     
-    // CORRECTED LINE
     quizDataText = quizDataText.replace(/```json/g, '').replace(/```/g, '').trim();
 
     const quizData = JSON.parse(quizDataText);
@@ -95,6 +95,7 @@ const submitQuiz = asyncHandler(async (req, res) => {
 
 const getQuizReview = async (req, res) => {
     try {
+        console.log("--- GET QUIZ REVIEW ---");
         const { attemptId } = req.params;
         const user = await User.findById(req.user._id).populate('quizHistory.quizId');
 
@@ -109,11 +110,16 @@ const getQuizReview = async (req, res) => {
             res.status(404);
             throw new Error('Quiz attempt not found');
         }
+
+        console.log("--- Found quiz attempt successfully ---");
         res.status(200).json(attempt);
     } catch (error) {
-        console.error("--- CRITICAL ERROR IN GETQUIZREVIEW ---", error);
-        res.status(500).json({ message: "A critical error occurred while fetching the review." });
+        // --- THIS WILL CATCH THE HIDDEN ERROR ---
+        console.error("--- CRITICAL ERROR IN GETQUIZREVIEW ---");
+        console.error(error);
+        res.status(500).json({ message: "A critical error occurred on the server while fetching the review." });
     }
 };
+
 
 export { generateQuiz, getQuizById, submitQuiz, getQuizReview };
