@@ -5,11 +5,12 @@ import { FiAward, FiBarChart2, FiZap, FiPlusCircle, FiCheckCircle } from 'react-
 
 const DashboardPage = () => {
   const { user, refreshUser } = useContext(AuthContext);
-  const location = useLocation();
+  const location = useLocation(); // Gets the current page location
 
   useEffect(() => {
+    // This function will now run every time you navigate to the dashboard
     refreshUser();
-  }, [location, refreshUser]);
+  }, [location, refreshUser]); // The dependency on 'location' forces a refresh on navigation
 
   if (!user) {
     return <div className="text-center mt-10">Loading...</div>;
