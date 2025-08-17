@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// The server expects requests to start with '/api'
+// Use the correct base paths for all routers
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
