@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 
@@ -33,8 +33,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  // Function to refresh user data from the server
-  const refreshUser = async () => {
+  // Stabilize the refreshUser function with useCallback
+  const refreshUser = useCallback(async () => {
     if (!user?.token) return;
     try {
       const config = {
@@ -42,15 +42,12 @@ export const AuthProvider = ({ children }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      // --- CACHE-BUSTING FIX ---
-      // Added a unique timestamp to the URL to prevent browser caching
       const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/me?t=${new Date().getTime()}`, config);
-      
       login({ ...data, token: user.token });
     } catch (error) {
       console.error("Failed to refresh user data", error);
     }
-  };
+  }, [user?.token]); // Dependency array ensures function is stable
 
   return (
     <AuthContext.Provider value={{ user, login, logout, refreshUser }}>
