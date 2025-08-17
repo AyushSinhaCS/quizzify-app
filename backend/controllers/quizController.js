@@ -33,7 +33,7 @@ const generateQuiz = asyncHandler(async (req, res) => {
     const response = await result.response;
     let quizDataText = response.text();
     
-    quizDataText = quizDataText.replace(/```json/g, '').replace(/```/g, '').trim();
+    quizDataText = quizDataText.replace(/```json/g, '').replace(/```g, '').trim();
 
     const quizData = JSON.parse(quizDataText);
 
