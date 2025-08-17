@@ -32,7 +32,9 @@ const generateQuiz = asyncHandler(async (req, res) => {
     const response = await result.response;
     let quizDataText = response.text();
     
-    quizDataText = quizDataText.replace(/```json/g, '').replace(/```g, '').trim();
+    // CORRECTED LINE
+    quizDataText = quizDataText.replace(/```json/g, '').replace(/```/g, '').trim();
+
     const quizData = JSON.parse(quizDataText);
 
     const newQuiz = await Quiz.create({
