@@ -101,3 +101,12 @@ npm install
 # Start the client
 npm start
 
+## License
+
+**Copyright (c) 2025 Ayush Sinha. All Rights Reserved.**
+
+This project is proprietary software. You are not permitted to copy, modify, distribute, or use this software in any way without obtaining express written permission from the author.
+
+You may view the source code for educational or reference purposes only.
+
+To request permission or a license for usage, please contact me at [your-email@example.com].
